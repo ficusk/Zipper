@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Hello World, ZipperActivity!</string>
+    <string name="app_name">Zipper</string>
+    <string name="import_instructions">Paste the JSON export data from clipperz.com here.</string>
+    <string name="copied_to_clipboard">Copied to clipboard.</string>
+    <string name="save">Save</string>
+    <string name="parse_error">Couldn\'t parse JSON data.</string>
+    <string name="save_error">Couldn\'t save JSON data.</string>
+    <string name="clear_data">Clear data</string>
+    <string name="go_to_clipperz">Go to www.clipperz.com</string>
+</resources>

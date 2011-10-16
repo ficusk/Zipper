@@ -1,0 +1,4 @@
+- Encrypt locally on disk?
+- Paste button for import
+- Clear clipboard? Button? Timer?
+
