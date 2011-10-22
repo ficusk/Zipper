@@ -30,32 +30,37 @@ import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
-import java.io.File;
 import java.util.List;
 
+/**
+ * The main activity that displays all the Clipperz cards.
+ */
 public class ZipperActivity extends Activity {
-    public static final String JSON_DATA_FILE = "clipperz.json";
-
+    /** List view of all cards; card is a group, each field is a child. */
     private ExpandableListView mListView;
+
+    /** Our adapter for populating the ListView. */
     private ZipperAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-
         mListView = (ExpandableListView) findViewById(R.id.main_list);
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        String jsonData = Files.read(new File(getFilesDir(), JSON_DATA_FILE));
+
+        // TODO: Don't read and parse every time in onResume, use startActivityForResult
+        // to open the import activity.
+        String jsonData = Files.read(Files.getJsonDataFile(this));
         if (jsonData == null) {
             goToImportActivity();
             return;
         }
+
         List<ClipperzCard> cards = ClipperzCard.from(jsonData);
         mAdapter = new ZipperAdapter(this, cards);
         mListView.setAdapter(mAdapter);
@@ -80,7 +85,8 @@ public class ZipperActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
         case R.id.clear_data:
-            new File(getFilesDir(), JSON_DATA_FILE).delete();
+            // Delete the data file on disk and go to the import activity.
+            Files.getJsonDataFile(this).delete();
             goToImportActivity();
             return true;
         default:
@@ -88,6 +94,9 @@ public class ZipperActivity extends Activity {
         }
     }
 
+    /**
+     * A ClickListener for fields that copies their value to the clipboard and displays a toast.
+     */
     private class FieldClickListener implements ExpandableListView.OnChildClickListener {
 
         @Override

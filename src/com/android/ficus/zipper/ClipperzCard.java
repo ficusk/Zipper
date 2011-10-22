@@ -25,24 +25,58 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-class ClipperzCard {
+/**
+ * One Clipperz card.
+ */
+public class ClipperzCard {
+    /** The display name of this card. */
+    public final String label;
+    /** An ordered list of key/value fields for this card. */
+    public final List<ClipperzField> fields;
+
+    /**
+     * Create a new Clipperz card.
+     * @param label Display name of this card
+     * @param fields List of fields
+     */
     public ClipperzCard(String label, List<ClipperzField> fields) {
         this.label = label;
         this.fields = fields;
     }
 
-    public final String label;
-    public final List<ClipperzField> fields;
+    /**
+     * One name/value field in a Clipperz card.
+     */
+    public static class ClipperzField {
+        public ClipperzField(String name, String value, boolean hidden) {
+            this.name = name;
+            this.value = value;
+            this.hidden = hidden;
+        }
 
+        public final String name;
+        public final String value;
+        public final boolean hidden;
+    }
+
+    /**
+     * Parse a list of Clipperz cards from a JSON-formatted string in the format
+     * exported by Clipperz JSON Export mode.
+     * @return A list of cards or null if the string cannot be parsed
+     */
     public static List<ClipperzCard> from(String jsonString) {
         JSONTokener tokener = new JSONTokener(jsonString);
         try {
-            JSONArray root = (JSONArray) tokener.nextValue();
             List<ClipperzCard> cards = new ArrayList<ClipperzCard>();
+
+            // Each card is a subobject in a root-level array.
+            JSONArray root = (JSONArray) tokener.nextValue();
             for (int i = 0; i < root.length(); i++) {
                 JSONObject obj = root.getJSONObject(i);
                 String label = obj.getString("label");
                 JSONObject rawFields = obj.getJSONObject("currentVersion").getJSONObject("fields");
+
+                // Walk the fields in the JSON object and convert to ClipperzFields.
                 List<ClipperzField> fields = new ArrayList<ClipperzField>();
                 @SuppressWarnings("unchecked") Iterator<String> fieldIterator = rawFields.keys();
                 while (fieldIterator.hasNext()) {
@@ -54,23 +88,13 @@ class ClipperzCard {
                             fieldObj.getBoolean("hidden"));
                     fields.add(field);
                 }
+
+                // Create a card and add it to the list.
                 cards.add(new ClipperzCard(label, fields));
             }
             return cards;
         } catch (JSONException e) {
             return null;
         }
-    }
-
-    public static class ClipperzField {
-        public ClipperzField(String name, String value, boolean hidden) {
-            this.name = name;
-            this.value = value;
-            this.hidden = hidden;
-        }
-
-        public final String name;
-        public final String value;
-        public final boolean hidden;
     }
 }

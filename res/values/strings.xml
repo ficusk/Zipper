@@ -9,4 +9,5 @@
     <string name="save_error">Couldn\'t save JSON data.</string>
     <string name="clear_data">Clear data</string>
     <string name="go_to_clipperz">Go to www.clipperz.com</string>
+    <string name="hidden">(hidden)</string>
 </resources>

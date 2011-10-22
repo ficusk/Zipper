@@ -24,11 +24,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.File;
 import java.io.IOException;
 
+/**
+ * The activity for importing the Clipperz JSON data.
+ */
 public class ImportActivity extends Activity {
-
+    /** The text field for pasting the JSON data into. */
     private EditText mJsonDataView;
 
     @Override
@@ -43,14 +45,18 @@ public class ImportActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String jsonData = mJsonDataView.getText().toString();
+
+                // If the data pasted in by the user can't be parsed, show a toast
+                // and do nothing.
                 if (ClipperzCard.from(jsonData) == null) {
                     Toast.makeText(ImportActivity.this, R.string.parse_error,
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                // Otherwise, write the JSON data to our local file and finish.
                 try {
-                    Files.write(
-                            new File(getFilesDir(), ZipperActivity.JSON_DATA_FILE), jsonData);
+                    Files.write(Files.getJsonDataFile(ImportActivity.this), jsonData);
                 } catch (IOException e) {
                     Toast.makeText(ImportActivity.this, R.string.save_error,
                             Toast.LENGTH_SHORT).show();
