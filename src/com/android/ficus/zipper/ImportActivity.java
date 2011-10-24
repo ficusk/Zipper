@@ -18,18 +18,27 @@ package com.android.ficus.zipper;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * The activity for importing the Clipperz JSON data.
  */
 public class ImportActivity extends Activity {
+    private static final boolean DEBUG = false;
+
+    public static final String PASSWORD_EXTRA = "password";
+
     /** The text field for pasting the JSON data into. */
     private EditText mJsonDataView;
 
@@ -73,4 +82,32 @@ public class ImportActivity extends Activity {
         });
     }
 
+    @SuppressWarnings("unused") // For when DEBUG == false
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!DEBUG) {
+            return false;
+        }
+
+        MenuItem useDebugDataItem = menu.add("Use debug data");
+        useDebugDataItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                try {
+                    InputStream debugJson = getResources().openRawResource(R.raw.debug_json);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int count;
+                    while ((count = debugJson.read(buffer)) != -1) {
+                        baos.write(buffer, 0, count);
+                    }
+                    mJsonDataView.setText(new String(baos.toByteArray()));
+                    return true;
+                } catch (IOException e) {
+                    return true;
+                }
+            }
+        });
+        return true;
+    }
 }
