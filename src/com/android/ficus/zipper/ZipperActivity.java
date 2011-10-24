@@ -56,12 +56,9 @@ public class ZipperActivity extends Activity {
         mListView = (ExpandableListView) findViewById(R.id.main_list);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
+    private void loadData() {
         // TODO: Don't read and parse every time in onResume, use startActivityForResult
-        // to open the import activity.
+        // to open the import activity. Clear password in onActivityResult.
         File jsonDataFile = Files.getJsonDataFile(this);
         if (!jsonDataFile.exists()) {
             goToImportActivity();
@@ -86,6 +83,13 @@ public class ZipperActivity extends Activity {
         mListView.setOnChildClickListener(new FieldClickListener());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadData();
+    }
+
     private static final int PASSWORD_DIALOG = 1;
 
     @Override
@@ -100,6 +104,7 @@ public class ZipperActivity extends Activity {
                 public void onClick(View v) {
                     sCurrentPassword = password.getText().toString();
                     dismissDialog(PASSWORD_DIALOG);
+                    loadData();
                 }
             });
 
