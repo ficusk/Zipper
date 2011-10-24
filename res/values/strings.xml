@@ -10,4 +10,8 @@
     <string name="clear_data">Clear data</string>
     <string name="go_to_clipperz">Go to www.clipperz.com</string>
     <string name="hidden">(hidden)</string>
+    <string name="password_prompt">Password:</string>
+    <string name="password_dialog_header">Enter the password used to save your Clipperz export file.</string>
+    <string name="ok">OK</string>
+    <string name="reset_data">Reset data</string>
 </resources>

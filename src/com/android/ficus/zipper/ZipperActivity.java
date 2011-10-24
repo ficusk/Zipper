@@ -19,6 +19,7 @@ package com.android.ficus.zipper;
 import com.android.ficus.zipper.ClipperzCard.ClipperzField;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,9 +28,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -41,6 +46,8 @@ public class ZipperActivity extends Activity {
 
     /** Our adapter for populating the ListView. */
     private ZipperAdapter mAdapter;
+
+    private static String sCurrentPassword = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,9 +62,21 @@ public class ZipperActivity extends Activity {
 
         // TODO: Don't read and parse every time in onResume, use startActivityForResult
         // to open the import activity.
-        String jsonData = Files.read(Files.getJsonDataFile(this));
-        if (jsonData == null) {
+        File jsonDataFile = Files.getJsonDataFile(this);
+        if (!jsonDataFile.exists()) {
             goToImportActivity();
+            return;
+        }
+
+        // TODO: Bypass this if there is no password set?
+        if (sCurrentPassword == null) {
+            showDialog(PASSWORD_DIALOG);
+            return;
+        }
+
+        String jsonData = Files.readEncrypted(jsonDataFile, sCurrentPassword);
+        if (jsonData == null) {
+            showDialog(PASSWORD_DIALOG);
             return;
         }
 
@@ -65,6 +84,38 @@ public class ZipperActivity extends Activity {
         mAdapter = new ZipperAdapter(this, cards);
         mListView.setAdapter(mAdapter);
         mListView.setOnChildClickListener(new FieldClickListener());
+    }
+
+    private static final int PASSWORD_DIALOG = 1;
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        if (id == PASSWORD_DIALOG) {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.password_dialog);
+            final EditText password = (EditText) dialog.findViewById(R.id.password);
+            Button okButton = (Button) dialog.findViewById(R.id.ok_button);
+            okButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sCurrentPassword = password.getText().toString();
+                    dismissDialog(PASSWORD_DIALOG);
+                }
+            });
+
+            Button resetDataButton = (Button) dialog.findViewById(R.id.reset_data_button);
+            resetDataButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goToImportActivity();
+                    dismissDialog(PASSWORD_DIALOG);
+                }
+            });
+
+            return dialog;
+        }
+
+        return super.onCreateDialog(id);
     }
 
     private void goToImportActivity() {

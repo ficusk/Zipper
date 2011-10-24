@@ -33,12 +33,16 @@ public class ImportActivity extends Activity {
     /** The text field for pasting the JSON data into. */
     private EditText mJsonDataView;
 
+    /** The text field containing the password to encrypt the card file with. */
+    private EditText mPasswordView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.json_import);
 
         mJsonDataView = (EditText) findViewById(R.id.json_data);
+        mPasswordView = (EditText) findViewById(R.id.password);
 
         Button saveButton = (Button) findViewById(R.id.save);
         saveButton.setOnClickListener(new OnClickListener() {
@@ -56,7 +60,10 @@ public class ImportActivity extends Activity {
 
                 // Otherwise, write the JSON data to our local file and finish.
                 try {
-                    Files.write(Files.getJsonDataFile(ImportActivity.this), jsonData);
+                    Files.writeEncrypted(
+                            Files.getJsonDataFile(ImportActivity.this),
+                            jsonData,
+                            mPasswordView.getText().toString());
                 } catch (IOException e) {
                     Toast.makeText(ImportActivity.this, R.string.save_error,
                             Toast.LENGTH_SHORT).show();

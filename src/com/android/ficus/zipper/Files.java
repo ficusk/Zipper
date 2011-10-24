@@ -37,7 +37,7 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Files {
 
-    private static final String JSON_DATA_FILE = "clipperz.json";
+    private static final String JSON_DATA_FILE = "cards.dat";
 
     /**
      * Returns a File referencing the JSON data file of cards stored on disk.
@@ -52,7 +52,7 @@ public class Files {
      * @param file The file to read
      * @return The contents of the file as a byte[], or null if it can't be read
      */
-    public static byte[] readBytes(File file) {
+    private static byte[] readBytes(File file) {
         if (!file.exists()) {
             return null;
         }
@@ -74,27 +74,27 @@ public class Files {
         return result;
     }
 
-    /**
-     * Reads the entire contents of the given file and returns as a String.
-     * @param file The file to read
-     * @return The contents of the file as a String, or null if it can't be read
-     */
-    public static String read(File file) {
-        byte[] data = readBytes(file);
-        return data == null ? null : new String(data);
-    }
-
-    /**
-     * Writes the given String out to the given File.
-     */
-    public static void write(File file, String data) throws IOException {
-        write(file, data.getBytes());
-    }
+//    /**
+//     * Reads the entire contents of the given file and returns as a String.
+//     * @param file The file to read
+//     * @return The contents of the file as a String, or null if it can't be read
+//     */
+//    private static String read(File file) {
+//        byte[] data = readBytes(file);
+//        return data == null ? null : new String(data);
+//    }
+//
+//    /**
+//     * Writes the given String out to the given File.
+//     */
+//    private static void write(File file, String data) throws IOException {
+//        write(file, data.getBytes());
+//    }
 
     /**
      * Writes the given byte array out to the given File.
      */
-    public static void write(File file, byte[] data) throws IOException {
+    private static void write(File file, byte[] data) throws IOException {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
         fos.close();
