@@ -1,3 +1,5 @@
 - Paste button for import
 - Clear clipboard? Button? Timer?
+- ClassCastException when parsing invalid JSON (e.g. no outer array)
+- startActivityForResult for loading data
 
