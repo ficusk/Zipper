@@ -3,12 +3,18 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="?android:attr/listPreferredItemHeight">
     
-   <TextView android:layout_width="wrap_content"
-	  android:layout_height="?android:attr/listPreferredItemHeight"
-	  android:gravity="left|center_vertical"
-	  android:textAppearance="?android:attr/textAppearanceMedium"
-	  android:id="@+id/field_text"></TextView>
+	<TextView android:id="@+id/field_name"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="name"
+		android:textAppearance="?android:attr/textAppearanceSmall" />
+
+	<TextView android:id="@+id/field_value"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="value"
+		android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>
