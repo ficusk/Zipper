@@ -22,6 +22,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.ClipboardManager;
@@ -142,8 +144,13 @@ public class ZipperActivity extends Activity {
             }
         });
 
-        // Not cancelable; only OK and Reset do anything useful.
-        builder.setCancelable(false);
+        // Only OK and Reset do anything useful, so just quit if the user presses BACK.
+        builder.setOnCancelListener(new OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                finish();
+            }
+        });
 
         // Make the dialog and request focus on the password entry field when it is shown.
         final Dialog dialog = builder.create();
