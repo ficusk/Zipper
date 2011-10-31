@@ -200,6 +200,11 @@ public class ZipperActivity extends Activity {
             Files.getJsonDataFile(this).delete();
             goToImportActivity();
             return true;
+        case R.id.lock:
+            sCurrentPassword = null;
+            mAdapter.clear();
+            showDialog(PASSWORD_DIALOG);
+            return true;
         default:
             return super.onOptionsItemSelected(item);
         }

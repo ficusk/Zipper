@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:enabled="true" android:title="@string/clear_data" android:visible="true" android:id="@+id/clear_data"></item>
-    
+    <item android:id="@+id/lock"
+        android:title="@string/lock"
+        android:enabled="true"
+        android:visible="true"
+        android:icon="@drawable/ic_menu_link" />
+    <item android:id="@+id/clear_data"
+        android:enabled="true"
+        android:title="@string/clear_data"
+        android:visible="true"
+        android:icon="@drawable/ic_menu_stop" />
 </menu>

@@ -41,6 +41,11 @@ public class ZipperAdapter extends BaseExpandableListAdapter {
         mCards = cards;
     }
 
+    public void clear() {
+        mCards.clear();
+        notifyDataSetChanged();
+    }
+
     @Override
     public Object getChild(int groupPosition, int childPosition) {
         return mCards.get(groupPosition).fields.get(childPosition);
