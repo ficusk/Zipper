@@ -19,11 +19,13 @@ package com.android.ficus.zipper;
 import com.android.ficus.zipper.ClipperzCard.ClipperzField;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -73,6 +75,7 @@ public class ZipperActivity extends Activity {
 
         String jsonData = Files.readEncrypted(jsonDataFile, sCurrentPassword);
         if (jsonData == null) {
+            sCurrentPassword = null;
             showDialog(PASSWORD_DIALOG);
             return;
         }
@@ -94,33 +97,53 @@ public class ZipperActivity extends Activity {
 
     @Override
     protected Dialog onCreateDialog(int id) {
-        if (id == PASSWORD_DIALOG) {
-            Dialog dialog = new Dialog(this);
-            dialog.setContentView(R.layout.password_dialog);
-            final EditText password = (EditText) dialog.findViewById(R.id.password);
-            Button okButton = (Button) dialog.findViewById(R.id.ok_button);
-            okButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sCurrentPassword = password.getText().toString();
-                    dismissDialog(PASSWORD_DIALOG);
-                    loadData();
-                }
-            });
-
-            Button resetDataButton = (Button) dialog.findViewById(R.id.reset_data_button);
-            resetDataButton.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    goToImportActivity();
-                    dismissDialog(PASSWORD_DIALOG);
-                }
-            });
-
-            return dialog;
+        switch(id) {
+            case PASSWORD_DIALOG:
+                return makePasswordDialog();
+            default:
+                return super.onCreateDialog(id);
         }
+    }
 
-        return super.onCreateDialog(id);
+    /**
+     * Makes the password dialog shown when we have saved data that needs to be decrypted.
+     */
+    private Dialog makePasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        // Set up our custom view.
+        View passwordEntry = LayoutInflater.from(this).inflate(R.layout.password_dialog, null);
+        builder.setView(passwordEntry);
+        builder.setTitle(R.string.password_dialog_title);
+
+        // OK button - set current password and try loading data. If data load
+        // fails, the activity will just re-show the password dialog.
+        Button okButton = (Button) passwordEntry.findViewById(R.id.ok_button);
+        final EditText password = (EditText) passwordEntry.findViewById(R.id.password);
+        okButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sCurrentPassword = password.getText().toString();
+                password.setText("");
+                dismissDialog(PASSWORD_DIALOG);
+                loadData();
+            }
+        });
+
+        // "Reset data" button - go to the import activity to reimport.
+        Button resetDataButton = (Button) passwordEntry.findViewById(R.id.reset_data_button);
+        resetDataButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToImportActivity();
+                dismissDialog(PASSWORD_DIALOG);
+            }
+        });
+
+        // Not cancelable; only OK and Reset do anything useful.
+        builder.setCancelable(false);
+
+        return builder.create();
     }
 
     private static final int REQUEST_IMPORT = 1;
