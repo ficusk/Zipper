@@ -31,6 +31,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -130,6 +131,7 @@ public class ZipperActivity extends Activity {
             }
         });
 
+
         // "Reset data" button - go to the import activity to reimport.
         Button resetDataButton = (Button) passwordEntry.findViewById(R.id.reset_data_button);
         resetDataButton.setOnClickListener(new OnClickListener() {
@@ -143,7 +145,19 @@ public class ZipperActivity extends Activity {
         // Not cancelable; only OK and Reset do anything useful.
         builder.setCancelable(false);
 
-        return builder.create();
+        // Make the dialog and request focus on the password entry field when it is shown.
+        final Dialog dialog = builder.create();
+        password.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    dialog.getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
+        return dialog;
     }
 
     private static final int REQUEST_IMPORT = 1;
