@@ -60,7 +60,7 @@ public class ZipperAdapter extends BaseExpandableListAdapter {
         ClipperzField field = mCards.get(groupPosition).fields.get(childPosition);
         String text = field.name + ": ";
         // TODO: Add an option for showing/hiding passwords?
-        text = field.hidden ? mContext.getString(R.string.hidden): field.value;
+        text += field.hidden ? mContext.getString(R.string.hidden): field.value;
         TextView fieldView = (TextView) convertView.findViewById(R.id.field_text);
         fieldView.setText(text);
         return convertView;
