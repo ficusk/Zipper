@@ -17,6 +17,7 @@
 package com.android.ficus.zipper;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +59,7 @@ public class ImportActivity extends Activity {
             @Override
             public void onClick(View v) {
                 String jsonData = mJsonDataView.getText().toString();
+                String password = mPasswordView.getText().toString();
 
                 // If the data pasted in by the user can't be parsed, show a toast
                 // and do nothing.
@@ -71,12 +73,14 @@ public class ImportActivity extends Activity {
                 try {
                     Files.writeEncrypted(
                             Files.getJsonDataFile(ImportActivity.this),
-                            jsonData,
-                            mPasswordView.getText().toString());
+                            jsonData, password);
                 } catch (IOException e) {
                     Toast.makeText(ImportActivity.this, R.string.save_error,
                             Toast.LENGTH_SHORT).show();
                 }
+                Intent result = new Intent();
+                result.putExtra(PASSWORD_EXTRA, password);
+                setResult(RESULT_OK);
                 finish();
             }
         });

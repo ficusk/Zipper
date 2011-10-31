@@ -123,10 +123,21 @@ public class ZipperActivity extends Activity {
         return super.onCreateDialog(id);
     }
 
+    private static final int REQUEST_IMPORT = 1;
+
     private void goToImportActivity() {
         Intent intent = new Intent();
         intent.setClass(this, ImportActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_IMPORT);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMPORT && resultCode == RESULT_OK) {
+            // Set the current password to the one the user just chose
+            // in the import activity. onResume() will reload the data.
+            sCurrentPassword = data.getStringExtra(ImportActivity.PASSWORD_EXTRA);
+        }
     }
 
     @Override
