@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent" android:weightSum="1">
-    <TextView android:id="@+id/instructions" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/import_instructions"></TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:linksClickable="true"
+        android:text="@string/import_instructions" />
 
-        <Button android:id="@+id/save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/save" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/go_to_clipperz"
-            android:autoLink="web"
-            android:layout_centerInParent="true"
-            android:linksClickable="true" />
-    </LinearLayout>
-
-    <!-- Password: _____ line -->
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/password_prompt" />
-
-        <EditText android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword" />
-    </LinearLayout>
-
-    <EditText android:id="@+id/json_data"
+    <EditText
+        android:id="@+id/json_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_weight="1.01"
         android:gravity="top|left"
-        android:inputType="textMultiLine"
-        android:layout_weight="1.13">
+        android:inputType="textMultiLine">
         <requestFocus />
     </EditText>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+  	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.76"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:text="@string/password_prompt" />
+
+  	    <CheckBox android:id="@+id/show_password_checkbox"
+  	        android:layout_width="wrap_content"
+  	        android:layout_height="wrap_content"
+  	        android:text="@string/show_password" />
+
+  	</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+	   	<EditText
+	        android:id="@+id/password"
+	        android:layout_width="194dp"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="0.76"
+	        android:inputType="textPassword" />
+	    <Button
+	        android:id="@+id/save"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/save" />
+	</LinearLayout>
     
 </LinearLayout>

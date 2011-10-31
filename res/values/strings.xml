@@ -8,10 +8,10 @@
     <string name="parse_error">Couldn\'t parse JSON data.</string>
     <string name="save_error">Couldn\'t save JSON data.</string>
     <string name="clear_data">Clear data</string>
-    <string name="go_to_clipperz">Go to www.clipperz.com</string>
     <string name="hidden">(hidden)</string>
-    <string name="password_prompt">Password:</string>
+    <string name="password_prompt">Enter a password.</string>
     <string name="password_dialog_header">Enter the password used to save your Clipperz export file.</string>
     <string name="ok">OK</string>
     <string name="reset_data">Reset data</string>
+    <string name="show_password">Show</string>
 </resources>

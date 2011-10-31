@@ -19,12 +19,16 @@ package com.android.ficus.zipper;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -54,6 +58,28 @@ public class ImportActivity extends Activity {
         mJsonDataView = (EditText) findViewById(R.id.json_data);
         mPasswordView = (EditText) findViewById(R.id.password);
 
+        // Set up the show/hide password checkbox.
+        CheckBox passwordCheckBox = (CheckBox) findViewById(R.id.show_password_checkbox);
+        passwordCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Get the existing input type, minus any password flags.
+                int newType = mPasswordView.getInputType();
+                newType &= ~InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                newType &= ~InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD;
+
+                // Pick which password flag to set.
+                int whichPasswordType = isChecked
+                        ? InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                        : InputType.TYPE_TEXT_VARIATION_PASSWORD;
+
+                // Add it to the flag set and set the new type.
+                newType |= whichPasswordType;
+                mPasswordView.setInputType(newType);
+            }
+        });
+
+        // Set up the Save button.
         Button saveButton = (Button) findViewById(R.id.save);
         saveButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -80,7 +106,7 @@ public class ImportActivity extends Activity {
                 }
                 Intent result = new Intent();
                 result.putExtra(PASSWORD_EXTRA, password);
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, result);
                 finish();
             }
         });
