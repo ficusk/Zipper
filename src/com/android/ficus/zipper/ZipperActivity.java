@@ -27,6 +27,8 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.ClipboardManager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,6 +39,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.ExpandableListContextMenuInfo;
 import android.widget.Toast;
 
 import java.io.File;
@@ -87,6 +90,46 @@ public class ZipperActivity extends Activity {
         mAdapter = new ZipperAdapter(this, cards);
         mListView.setAdapter(mAdapter);
         mListView.setOnChildClickListener(new FieldClickListener());
+        registerForContextMenu(mListView);
+    }
+
+    private static final int MENU_CONTEXT_REVEAL = 1;
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
+        // Only create context menus for children.
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
+            // Only create "Reveal" menu for hidden fields.
+            ClipperzField field = (ClipperzField) mAdapter.getChild(group, child);
+            if (field.hidden) {
+                menu.add(0, MENU_CONTEXT_REVEAL, 0, R.string.reveal);
+            }
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getItemId() != MENU_CONTEXT_REVEAL) {
+            return super.onContextItemSelected(item);
+        }
+
+        ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
+        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
+        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
+        ClipperzField field = (ClipperzField) mAdapter.getChild(group, child);
+
+        // Cheap reveal of the hidden field by showing it as a dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+            .setTitle(field.name)
+            .setMessage(field.value)
+            .setPositiveButton(R.string.ok, null);
+        builder.show();
+
+        return true;
     }
 
     @Override

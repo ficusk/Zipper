@@ -67,9 +67,8 @@ public class ZipperAdapter extends BaseExpandableListAdapter {
         TextView fieldName = (TextView) convertView.findViewById(R.id.field_name);
         fieldName.setText(field.name);
 
-        // TODO: Add an option for showing/hiding passwords?
         TextView fieldValue = (TextView) convertView.findViewById(R.id.field_value);
-        fieldValue.setText(field.hidden ? mContext.getString(R.string.hidden): field.value);
+        fieldValue.setText(field.hidden ? mContext.getString(R.string.hidden) : field.value);
         return convertView;
     }
 

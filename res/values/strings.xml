@@ -16,4 +16,5 @@
     <string name="show_password">Show</string>
     <string name="password_dialog_title">Enter password</string>
     <string name="lock">Lock</string>
+    <string name="reveal">Reveal</string>
 </resources>
