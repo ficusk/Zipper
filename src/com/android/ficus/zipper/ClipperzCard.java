@@ -95,6 +95,10 @@ public class ClipperzCard {
             return cards;
         } catch (JSONException e) {
             return null;
+        } catch (ClassCastException e) {
+            // For valid JSON of the wrong type, e.g. an object when we are expecting
+            // an array.
+            return null;
         }
     }
 }
