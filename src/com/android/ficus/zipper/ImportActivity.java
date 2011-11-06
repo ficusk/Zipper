@@ -17,14 +17,16 @@
 package com.android.ficus.zipper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.ClipboardManager;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -59,6 +61,39 @@ public class ImportActivity extends Activity {
         mPasswordView = (EditText) findViewById(R.id.password);
 
         // Set up the show/hide password checkbox.
+        setupShowPasswordCheckbox();
+
+        // Set up the Save button.
+        setupSaveButton();
+
+        // Check to see if the user already has valid JSON data in the clipboard.
+        checkClipboardForData();
+    }
+
+    private void checkClipboardForData() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+        final CharSequence clipboardText = clipboard.getText();
+
+        // Just bail if there's no text in the clipboard or it's not parseable.
+        if (clipboardText == null || ClipperzCard.from(clipboardText.toString()) == null) {
+            return;
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+            .setTitle(R.string.use_clipboard_data_title)
+            .setMessage(R.string.use_clipboard_data_message)
+            .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mJsonDataView.setText(clipboardText);
+                }
+            })
+            .setNegativeButton(R.string.no, null)
+            .create();
+        dialog.show();
+    }
+
+    private void setupShowPasswordCheckbox() {
         CheckBox passwordCheckBox = (CheckBox) findViewById(R.id.show_password_checkbox);
         passwordCheckBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
@@ -78,10 +113,11 @@ public class ImportActivity extends Activity {
                 mPasswordView.setInputType(newType);
             }
         });
+    }
 
-        // Set up the Save button.
+    private void setupSaveButton() {
         Button saveButton = (Button) findViewById(R.id.save);
-        saveButton.setOnClickListener(new OnClickListener() {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String jsonData = mJsonDataView.getText().toString();
@@ -112,32 +148,47 @@ public class ImportActivity extends Activity {
         });
     }
 
-    @SuppressWarnings("unused") // For when DEBUG == false
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (!DEBUG) {
             return false;
         }
+        @SuppressWarnings("unused") // shut up compiler when DEBUG == false
 
         MenuItem useDebugDataItem = menu.add("Use debug data");
         useDebugDataItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                try {
-                    InputStream debugJson = getResources().openRawResource(R.raw.debug_json);
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    byte[] buffer = new byte[1024];
-                    int count;
-                    while ((count = debugJson.read(buffer)) != -1) {
-                        baos.write(buffer, 0, count);
-                    }
-                    mJsonDataView.setText(new String(baos.toByteArray()));
-                    return true;
-                } catch (IOException e) {
-                    return true;
-                }
+                mJsonDataView.setText(getDebugData());
+                return true;
+            }
+        });
+
+        MenuItem copyDebugDataItem = menu.add("Copy debug data");
+        copyDebugDataItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                ClipboardManager clipboard =
+                    (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                clipboard.setText(getDebugData());
+                return true;
             }
         });
         return true;
+    }
+
+    private String getDebugData() {
+        try {
+            InputStream debugJson = getResources().openRawResource(R.raw.debug_json);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int count;
+            while ((count = debugJson.read(buffer)) != -1) {
+                baos.write(buffer, 0, count);
+            }
+            return new String(baos.toByteArray());
+        } catch (IOException e) {
+            return "";
+        }
     }
 }

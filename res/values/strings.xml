@@ -17,4 +17,8 @@
     <string name="password_dialog_title">Enter password</string>
     <string name="lock">Lock</string>
     <string name="reveal">Reveal</string>
+    <string name="use_clipboard_data_title">Use clipboard data</string>
+    <string name="use_clipboard_data_message">Paste the Clipperz data in the clipboard?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
