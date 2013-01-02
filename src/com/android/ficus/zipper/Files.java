@@ -18,18 +18,19 @@ package com.android.ficus.zipper;
 
 import android.content.Context;
 
-import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import java.util.UUID;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -48,73 +49,21 @@ public class Files {
     }
 
     /**
-     * Reads the entire contents of the given file and returns as a byte[].
-     * @param file The file to read
-     * @return The contents of the file as a byte[], or null if it can't be read
-     */
-    private static byte[] readBytes(File file) {
-        if (!file.exists()) {
-            return null;
-        }
-        byte[] result = null;
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int count;
-            while ((count = fis.read(buffer)) != -1) {
-                baos.write(buffer, 0, count);
-            }
-            result = baos.toByteArray();
-            baos.close();
-            fis.close();
-        } catch (IOException e) {
-            return null;
-        }
-        return result;
-    }
-
-//    /**
-//     * Reads the entire contents of the given file and returns as a String.
-//     * @param file The file to read
-//     * @return The contents of the file as a String, or null if it can't be read
-//     */
-//    private static String read(File file) {
-//        byte[] data = readBytes(file);
-//        return data == null ? null : new String(data);
-//    }
-//
-//    /**
-//     * Writes the given String out to the given File.
-//     */
-//    private static void write(File file, String data) throws IOException {
-//        write(file, data.getBytes());
-//    }
-
-    /**
-     * Writes the given byte array out to the given File.
-     */
-    private static void write(File file, byte[] data) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(data);
-        fos.close();
-    }
-
-    /**
      * Generates an AES {@link SecretKeySpec} for the given cleartext password.
      */
-    private static SecretKeySpec generateAesKey(String password) throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        SecureRandom random = new SecureRandom(password.getBytes());
-        keyGenerator.init(random);
-        SecretKey key = keyGenerator.generateKey();
-        return new SecretKeySpec(key.getEncoded(), "AES");
+    private static SecretKeySpec generateAesKey(String secret)
+            throws NoSuchAlgorithmException {
+        MessageDigest sha = MessageDigest.getInstance("SHA-1");
+        byte[] hash = sha.digest(secret.getBytes());
+        byte[] key = new byte[16];
+        System.arraycopy(hash, 0, key, 0, 16);
+        return new SecretKeySpec(key, "AES");
     }
 
     /**
      * AES-encrypts a string.
      * @param string The string to encrypt
-     * @param password The cleartext password to use for generating a key
+     * @param password The salted cleartext password to use for generating a key
      * @return The encrypted data as a byte[]
      */
     private static byte[] aesEncryptString(String string, String password)
@@ -128,7 +77,7 @@ public class Files {
     /**
      * AES-decrypts a string.
      * @param data The data to decrypt
-     * @param password The cleartext password to use for generating a key
+     * @param password The salted cleartext password to use for generating a key
      * @return The decrypted data as a String
      */
     private static String aesDecryptString(byte[] data, String password)
@@ -140,23 +89,53 @@ public class Files {
         return new String(decrypted);
     }
 
+    private static final int FILE_VERSION = 1;
+
+    /*
+     * The on-disk file uses a Java Data{Input,Output}Stream in the following format:
+     * int version       | version of this file format
+     * UTF salt          | salt for the password
+     * int data length   | number of bytes to follow
+     * byte[]...         | AES encrypted data with the key SHA1[0:15](salt + password)
+     */
+
     public static void writeEncrypted(File file, String data, String password) throws IOException {
         try {
-            byte[] encrypted = aesEncryptString(data, password);
-            write(file, encrypted);
+            FileOutputStream fos = new FileOutputStream(file);
+            DataOutputStream dos = new DataOutputStream(fos);
+            dos.writeInt(FILE_VERSION);
+            String salt = UUID.randomUUID().toString();
+            dos.writeUTF(salt);
+            byte[] encrypted = aesEncryptString(data, salt + password);
+            dos.writeInt(encrypted.length);
+            dos.write(encrypted);
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }
 
+
     public static String readEncrypted(File file, String password) {
         try {
-            byte[] encrypted = readBytes(file);
-            return aesDecryptString(encrypted, password);
+            FileInputStream fis = new FileInputStream(file);
+            DataInputStream dis = new DataInputStream(fis);
+            int version = dis.readInt();
+            if (version != FILE_VERSION) {
+                // XXX close stream
+                return null;
+            }
+            String salt = dis.readUTF();
+            int dataLen = dis.readInt();
+            byte[] encrypted = new byte[dataLen];
+            dis.readFully(encrypted);
+            return aesDecryptString(encrypted, salt + password);
+        } catch (FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
         } catch (GeneralSecurityException e) {
             // Meh. Better than dealing with Java's 9000 different crypto exceptions
             // that will never happen because everyone has AES.
-            return null;
         }
+        return null;
     }
 }
