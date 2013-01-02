@@ -28,7 +28,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * An ExpandableListAdapter that exposes each {@link ClipperzCard} as a group,
+ * An ExpandableListAdapter that exposes each {@link Card} as a group,
  * with each underlying field as a child of the group.
  */
 public class ZipperAdapter extends BaseExpandableListAdapter {

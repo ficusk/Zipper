@@ -46,7 +46,7 @@ import java.io.File;
 import java.util.List;
 
 /**
- * The main activity that displays all the Clipperz cards.
+ * The main activity that displays all the cards.
  */
 public class ZipperActivity extends Activity {
     /** List view of all cards; card is a group, each field is a child. */
@@ -67,8 +67,8 @@ public class ZipperActivity extends Activity {
     private void loadData() {
         // TODO: Don't read and parse every time in onResume, use startActivityForResult
         // to open the import activity. Clear password in onActivityResult.
-        File jsonDataFile = Files.getJsonDataFile(this);
-        if (!jsonDataFile.exists()) {
+        File dataFile = Files.getCardDataFile(this);
+        if (!dataFile.exists()) {
             goToImportActivity();
             return;
         }
@@ -79,14 +79,14 @@ public class ZipperActivity extends Activity {
             return;
         }
 
-        String jsonData = Files.readEncrypted(jsonDataFile, sCurrentPassword);
-        if (jsonData == null) {
+        String data = Files.readEncrypted(dataFile, sCurrentPassword);
+        if (data == null) {
             sCurrentPassword = null;
             showDialog(PASSWORD_DIALOG);
             return;
         }
 
-        List<Card> cards = Card.from(jsonData);
+        List<Card> cards = Card.from(data);
         mAdapter = new ZipperAdapter(this, cards);
         mListView.setAdapter(mAdapter);
         mListView.setOnChildClickListener(new FieldClickListener());
@@ -240,7 +240,7 @@ public class ZipperActivity extends Activity {
         switch (item.getItemId()) {
         case R.id.clear_data:
             // Delete the data file on disk and go to the import activity.
-            Files.getJsonDataFile(this).delete();
+            Files.getCardDataFile(this).delete();
             goToImportActivity();
             return true;
         case R.id.lock:

@@ -64,7 +64,7 @@ public class Card {
             return clipperz;
         }
 
-        List<Card> lastpass = LastpassFormat.from(data);
+        List<Card> lastpass = LastPassFormat.from(data);
         if (lastpass != null) {
             return lastpass;
         }

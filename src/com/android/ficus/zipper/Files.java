@@ -38,14 +38,14 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Files {
 
-    private static final String JSON_DATA_FILE = "cards.dat";
+    private static final String CARD_DATA_FILE = "cards.dat";
 
     /**
-     * Returns a File referencing the JSON data file of cards stored on disk.
+     * Returns a File referencing the data file of cards stored on disk.
      * @param context Context to use for finding the app's files directory
      */
-    public static File getJsonDataFile(Context context) {
-        return new File(context.getFilesDir(), JSON_DATA_FILE);
+    public static File getCardDataFile(Context context) {
+        return new File(context.getFilesDir(), CARD_DATA_FILE);
     }
 
     /**

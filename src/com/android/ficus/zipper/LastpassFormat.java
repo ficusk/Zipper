@@ -25,7 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class LastpassFormat {
+public class LastPassFormat {
     private static final Set<String> HIDDEN_FIELDS = new HashSet<String>();
     private static final Set<String> IGNORE_VALUES = new HashSet<String>();
     static {

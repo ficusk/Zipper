@@ -39,15 +39,15 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * The activity for importing the Clipperz JSON data.
+ * The activity for importing card data.
  */
 public class ImportActivity extends Activity {
     private static final boolean DEBUG = false;
 
     public static final String PASSWORD_EXTRA = "password";
 
-    /** The text field for pasting the JSON data into. */
-    private EditText mJsonDataView;
+    /** The text field for pasting the data into. */
+    private EditText mDataView;
 
     /** The text field containing the password to encrypt the card file with. */
     private EditText mPasswordView;
@@ -55,9 +55,9 @@ public class ImportActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.json_import);
+        setContentView(R.layout.import_data);
 
-        mJsonDataView = (EditText) findViewById(R.id.json_data);
+        mDataView = (EditText) findViewById(R.id.data);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         // Set up the show/hide password checkbox.
@@ -66,7 +66,7 @@ public class ImportActivity extends Activity {
         // Set up the Save button.
         setupSaveButton();
 
-        // Check to see if the user already has valid JSON data in the clipboard.
+        // Check to see if the user already has valid data in the clipboard.
         checkClipboardForData();
     }
 
@@ -74,18 +74,27 @@ public class ImportActivity extends Activity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         final CharSequence clipboardText = clipboard.getText();
 
-        // Just bail if there's no text in the clipboard or it's not parseable.
-        if (clipboardText == null || Card.from(clipboardText.toString()) == null) {
+        // Just bail if there's no text in the clipboard.
+        if (clipboardText == null) {
+            return;
+        }
+
+        int useDataMessageId = -1;
+        if (ClipperzFormat.from(clipboardText.toString()) != null) {
+            useDataMessageId = R.string.use_clipboard_data_message_clipperz;
+        } else if (LastPassFormat.from(clipboardText.toString()) != null) {
+            useDataMessageId = R.string.use_clipboard_data_message_lastpass;
+        } else {
             return;
         }
 
         AlertDialog dialog = new AlertDialog.Builder(this)
             .setTitle(R.string.use_clipboard_data_title)
-            .setMessage(R.string.use_clipboard_data_message)
+            .setMessage(useDataMessageId)
             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mJsonDataView.setText(clipboardText);
+                    mDataView.setText(clipboardText);
                 }
             })
             .setNegativeButton(R.string.no, null)
@@ -120,22 +129,22 @@ public class ImportActivity extends Activity {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String jsonData = mJsonDataView.getText().toString();
+                String data = mDataView.getText().toString();
                 String password = mPasswordView.getText().toString();
 
                 // If the data pasted in by the user can't be parsed, show a toast
                 // and do nothing.
-                if (Card.from(jsonData) == null) {
+                if (Card.from(data) == null) {
                     Toast.makeText(ImportActivity.this, R.string.parse_error,
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // Otherwise, write the JSON data to our local file and finish.
+                // Otherwise, write the data to our local file and finish.
                 try {
                     Files.writeEncrypted(
-                            Files.getJsonDataFile(ImportActivity.this),
-                            jsonData, password);
+                            Files.getCardDataFile(ImportActivity.this),
+                            data, password);
                 } catch (IOException e) {
                     Toast.makeText(ImportActivity.this, R.string.save_error,
                             Toast.LENGTH_SHORT).show();
@@ -159,16 +168,16 @@ public class ImportActivity extends Activity {
         useClipperzItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                mJsonDataView.setText(getDebugData(R.raw.debug_json));
+                mDataView.setText(getDebugData(R.raw.debug_json));
                 return true;
             }
         });
 
-        MenuItem useLastpassItem = menu.add("Use Lastpass data");
+        MenuItem useLastpassItem = menu.add("Use LastPass data");
         useLastpassItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                mJsonDataView.setText(getDebugData(R.raw.debug_lastpass));
+                mDataView.setText(getDebugData(R.raw.debug_lastpass));
                 return true;
             }
         });
@@ -178,11 +187,11 @@ public class ImportActivity extends Activity {
 
     private String getDebugData(int resId) {
         try {
-            InputStream debugJson = getResources().openRawResource(resId);
+            InputStream debugData = getResources().openRawResource(resId);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int count;
-            while ((count = debugJson.read(buffer)) != -1) {
+            while ((count = debugData.read(buffer)) != -1) {
                 baos.write(buffer, 0, count);
             }
             return new String(baos.toByteArray());
