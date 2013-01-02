@@ -16,7 +16,7 @@
 
 package com.android.ficus.zipper;
 
-import com.android.ficus.zipper.ClipperzCard.ClipperzField;
+import com.android.ficus.zipper.Card.Field;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -34,9 +34,9 @@ import java.util.List;
 public class ZipperAdapter extends BaseExpandableListAdapter {
 
     private final Context mContext;
-    private final List<ClipperzCard> mCards;
+    private final List<Card> mCards;
 
-    public ZipperAdapter(Context context, List<ClipperzCard> cards) {
+    public ZipperAdapter(Context context, List<Card> cards) {
         mContext = context;
         mCards = cards;
     }
@@ -63,7 +63,7 @@ public class ZipperAdapter extends BaseExpandableListAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.field_view, null);
         }
 
-        ClipperzField field = mCards.get(groupPosition).fields.get(childPosition);
+        Field field = mCards.get(groupPosition).fields.get(childPosition);
         TextView fieldName = (TextView) convertView.findViewById(R.id.field_name);
         fieldName.setText(field.name);
 

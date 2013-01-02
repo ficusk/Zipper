@@ -75,7 +75,7 @@ public class ImportActivity extends Activity {
         final CharSequence clipboardText = clipboard.getText();
 
         // Just bail if there's no text in the clipboard or it's not parseable.
-        if (clipboardText == null || ClipperzCard.from(clipboardText.toString()) == null) {
+        if (clipboardText == null || Card.from(clipboardText.toString()) == null) {
             return;
         }
 
@@ -125,7 +125,7 @@ public class ImportActivity extends Activity {
 
                 // If the data pasted in by the user can't be parsed, show a toast
                 // and do nothing.
-                if (ClipperzCard.from(jsonData) == null) {
+                if (Card.from(jsonData) == null) {
                     Toast.makeText(ImportActivity.this, R.string.parse_error,
                             Toast.LENGTH_SHORT).show();
                     return;

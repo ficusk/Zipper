@@ -16,7 +16,7 @@
 
 package com.android.ficus.zipper;
 
-import com.android.ficus.zipper.ClipperzCard.ClipperzField;
+import com.android.ficus.zipper.Card.Field;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -86,7 +86,7 @@ public class ZipperActivity extends Activity {
             return;
         }
 
-        List<ClipperzCard> cards = ClipperzCard.from(jsonData);
+        List<Card> cards = Card.from(jsonData);
         mAdapter = new ZipperAdapter(this, cards);
         mListView.setAdapter(mAdapter);
         mListView.setOnChildClickListener(new FieldClickListener());
@@ -104,7 +104,7 @@ public class ZipperActivity extends Activity {
         // Only create context menus for children.
         if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
             // Only create "Reveal" menu for hidden fields.
-            ClipperzField field = (ClipperzField) mAdapter.getChild(group, child);
+            Field field = (Field) mAdapter.getChild(group, child);
             if (field.hidden) {
                 menu.add(0, MENU_CONTEXT_REVEAL, 0, R.string.reveal);
             }
@@ -120,7 +120,7 @@ public class ZipperActivity extends Activity {
         ExpandableListContextMenuInfo info = (ExpandableListContextMenuInfo) item.getMenuInfo();
         int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
         int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
-        ClipperzField field = (ClipperzField) mAdapter.getChild(group, child);
+        Field field = (Field) mAdapter.getChild(group, child);
 
         // Cheap reveal of the hidden field by showing it as a dialog.
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
@@ -261,7 +261,7 @@ public class ZipperActivity extends Activity {
         @Override
         public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
                 int childPosition, long id) {
-            ClipperzField field = (ClipperzField) mAdapter.getChild(groupPosition, childPosition);
+            Field field = (Field) mAdapter.getChild(groupPosition, childPosition);
             ClipboardManager manager =
                 (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             manager.setText(field.value);

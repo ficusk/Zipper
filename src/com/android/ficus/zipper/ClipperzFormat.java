@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Ficus Kirkpatrick
+ * Copyright (C) 2013 Ficus Kirkpatrick
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.android.ficus.zipper;
 
+import com.android.ficus.zipper.Card.Field;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,49 +27,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * One Clipperz card.
- */
-public class ClipperzCard {
-    /** The display name of this card. */
-    public final String label;
-    /** An ordered list of key/value fields for this card. */
-    public final List<ClipperzField> fields;
-
-    /**
-     * Create a new Clipperz card.
-     * @param label Display name of this card
-     * @param fields List of fields
-     */
-    public ClipperzCard(String label, List<ClipperzField> fields) {
-        this.label = label;
-        this.fields = fields;
-    }
-
-    /**
-     * One name/value field in a Clipperz card.
-     */
-    public static class ClipperzField {
-        public ClipperzField(String name, String value, boolean hidden) {
-            this.name = name;
-            this.value = value;
-            this.hidden = hidden;
-        }
-
-        public final String name;
-        public final String value;
-        public final boolean hidden;
-    }
-
+public class ClipperzFormat {
     /**
      * Parse a list of Clipperz cards from a JSON-formatted string in the format
      * exported by Clipperz JSON Export mode.
      * @return A list of cards or null if the string cannot be parsed
      */
-    public static List<ClipperzCard> from(String jsonString) {
+    public static List<Card> from(String jsonString) {
         JSONTokener tokener = new JSONTokener(jsonString);
         try {
-            List<ClipperzCard> cards = new ArrayList<ClipperzCard>();
+            List<Card> cards = new ArrayList<Card>();
 
             // Each card is a subobject in a root-level array.
             JSONArray root = (JSONArray) tokener.nextValue();
@@ -76,13 +45,13 @@ public class ClipperzCard {
                 String label = obj.getString("label");
                 JSONObject rawFields = obj.getJSONObject("currentVersion").getJSONObject("fields");
 
-                // Walk the fields in the JSON object and convert to ClipperzFields.
-                List<ClipperzField> fields = new ArrayList<ClipperzField>();
+                // Walk the fields in the JSON object and convert to Fields.
+                List<Field> fields = new ArrayList<Field>();
                 @SuppressWarnings("unchecked") Iterator<String> fieldIterator = rawFields.keys();
                 while (fieldIterator.hasNext()) {
                     String fieldKey = fieldIterator.next();
                     JSONObject fieldObj = rawFields.getJSONObject(fieldKey);
-                    ClipperzField field = new ClipperzField(
+                    Field field = new Field(
                             fieldObj.getString("label"),
                             fieldObj.getString("value"),
                             fieldObj.getBoolean("hidden"));
@@ -90,7 +59,7 @@ public class ClipperzCard {
                 }
 
                 // Create a card and add it to the list.
-                cards.add(new ClipperzCard(label, fields));
+                cards.add(new Card(label, fields));
             }
             return cards;
         } catch (JSONException e) {
