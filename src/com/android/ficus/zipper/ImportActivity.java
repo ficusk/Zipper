@@ -155,31 +155,30 @@ public class ImportActivity extends Activity {
         }
         @SuppressWarnings("unused") // shut up compiler when DEBUG == false
 
-        MenuItem useDebugDataItem = menu.add("Use debug data");
-        useDebugDataItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+        MenuItem useClipperzItem = menu.add("Use Clipperz data");
+        useClipperzItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                mJsonDataView.setText(getDebugData());
+                mJsonDataView.setText(getDebugData(R.raw.debug_json));
                 return true;
             }
         });
 
-        MenuItem copyDebugDataItem = menu.add("Copy debug data");
-        copyDebugDataItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+        MenuItem useLastpassItem = menu.add("Use Lastpass data");
+        useLastpassItem.setOnMenuItemClickListener(new OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                ClipboardManager clipboard =
-                    (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-                clipboard.setText(getDebugData());
+                mJsonDataView.setText(getDebugData(R.raw.debug_lastpass));
                 return true;
             }
         });
+
         return true;
     }
 
-    private String getDebugData() {
+    private String getDebugData(int resId) {
         try {
-            InputStream debugJson = getResources().openRawResource(R.raw.debug_json);
+            InputStream debugJson = getResources().openRawResource(resId);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
             int count;
